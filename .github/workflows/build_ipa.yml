@@ -36,7 +36,7 @@ jobs:
             -project OpticLink.xcodeproj \
             -scheme OpticLink \
             -configuration Release \
-            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
             -derivedDataPath ./build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \

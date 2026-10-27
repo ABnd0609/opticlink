@@ -133,7 +133,7 @@ private func compressionOutputCallback(
         
         while bufferOffset < totalLength - avcCHeaderLength {
             var naluLength: UInt32 = 0
-            memcpy(&naluLength, basePointer + bufferOffset, sizeof(UInt32.self))
+            memcpy(&naluLength, basePointer + bufferOffset, MemoryLayout<UInt32>.size)
             naluLength = CFSwapInt32BigToHost(naluLength)
             
             packetData.append(startCode)
