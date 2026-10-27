@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+env/
+
+# Xcode & iOS
+build/
+DerivedData/
+*.ipa
+Payload/
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+*.mobiledevicepairing
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

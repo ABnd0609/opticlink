@@ -1,0 +1,58 @@
+name: Build OpticLink iOS IPA
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Compilar IPA para iOS (macOS Cloud)
+    runs-on: macos-14
+
+    steps:
+      - name: Descargar Código Fuente
+        uses: actions/checkout@v4
+
+      - name: Seleccionar Versión de Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+
+      - name: Generar Proyecto Xcode (.xcodeproj)
+        working-directory: ios
+        run: |
+          xcodegen generate
+
+      - name: Compilar Proyecto para iPhone (ARM64)
+        working-directory: ios
+        run: |
+          xcodebuild clean build \
+            -project OpticLink.xcodeproj \
+            -scheme OpticLink \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath ./build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Empaquetar Archivo .IPA
+        working-directory: ios
+        run: |
+          mkdir -p Payload
+          cp -r ./build/Build/Products/Release-iphoneos/OpticLink.app Payload/
+          zip -r OpticLink.ipa Payload
+          ls -la OpticLink.ipa
+
+      - name: Subir Artefacto IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: OpticLink-iOS-IPA
+          path: ios/OpticLink.ipa
+          retention-days: 14
