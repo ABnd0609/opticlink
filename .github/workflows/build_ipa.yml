@@ -29,9 +29,15 @@ jobs:
         run: |
           xcodegen generate
 
+      - name: Listar Esquemas y Configuración
+        working-directory: ios
+        run: |
+          xcodebuild -list -project OpticLink.xcodeproj
+
       - name: Compilar Proyecto para iPhone (ARM64)
         working-directory: ios
         run: |
+          set -o pipefail
           xcodebuild clean build \
             -project OpticLink.xcodeproj \
             -scheme OpticLink \
@@ -40,13 +46,16 @@ jobs:
             -derivedDataPath ./build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY=""
+            CODE_SIGN_IDENTITY="" \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES
 
       - name: Empaquetar Archivo .IPA
         working-directory: ios
         run: |
           mkdir -p Payload
-          cp -r ./build/Build/Products/Release-iphoneos/OpticLink.app Payload/
+          APP_PATH=$(find ./build -name "OpticLink.app" -type d | head -n 1)
+          echo "App encontrada en: $APP_PATH"
+          cp -r "$APP_PATH" Payload/
           zip -r OpticLink.ipa Payload
           ls -la OpticLink.ipa
 

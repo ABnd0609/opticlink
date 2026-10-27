@@ -1,5 +1,7 @@
 import SwiftUI
+import Foundation
 import AVFoundation
+import Darwin
 
 struct ContentView: View {
     @StateObject private var controller = AppCoordinator()
