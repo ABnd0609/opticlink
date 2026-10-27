@@ -16,25 +16,21 @@ jobs:
       - name: Descargar Código Fuente
         uses: actions/checkout@v4
 
-      - name: Seleccionar Versión de Xcode
+      - name: Preparar Entorno Xcode
         run: |
-          sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+          sudo xcodebuild -license accept || true
+          sudo xcodebuild -runFirstLaunch || true
           xcodebuild -version
 
       - name: Instalar XcodeGen
         run: brew install xcodegen
 
-      - name: Generar Proyecto Xcode (.xcodeproj)
+      - name: Generar Proyecto Xcode
         working-directory: ios
         run: |
           xcodegen generate
 
-      - name: Listar Esquemas y Configuración
-        working-directory: ios
-        run: |
-          xcodebuild -list -project OpticLink.xcodeproj
-
-      - name: Compilar Proyecto para iPhone (ARM64)
+      - name: Compilar Proyecto para iPhone
         working-directory: ios
         run: |
           set -o pipefail
@@ -47,7 +43,11 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            AD_HOC_CODE_SIGNING_ALLOWED=YES
+            AD_HOC_CODE_SIGNING_ALLOWED=YES 2>&1 | tee xcodebuild.log || {
+              echo "==== DETALLE DEL ERROR DE COMPILACIÓN ===="
+              tail -n 100 xcodebuild.log
+              exit 1
+            }
 
       - name: Empaquetar Archivo .IPA
         working-directory: ios
