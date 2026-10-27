@@ -13,7 +13,7 @@ Build settings from command line:
     CODE_SIGNING_INJECT_BASE_ENTITLEMENTS = NO
     CODE_SIGNING_REQUIRED = NO
 
-2026-10-27 20:38:34.866 xcodebuild[1210:5978] Writing error result bundle to /var/folders/s6/5hzmn6lx4dz5nxs7k_0slzph0000gn/T/ResultBundle_2026-27-10_20-38-0034.xcresult
+2026-10-27 20:40:10.332 xcodebuild[1203:6108] Writing error result bundle to /var/folders/s6/5hzmn6lx4dz5nxs7k_0slzph0000gn/T/ResultBundle_2026-27-10_20-40-0010.xcresult
 xcodebuild: error: Unable to read project 'OpticLink.xcodeproj'.
 	Reason: The project ‘OpticLink’ cannot be opened because it is in a future Xcode project file format (77). Adjust the project format using a compatible version of Xcode to allow it to be opened by this version of Xcode.
 
