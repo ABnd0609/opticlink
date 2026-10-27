@@ -61,6 +61,25 @@ jobs:
           APP_PATH=$(find ./build -name "OpticLink.app" -type d | head -n 1)
           echo "App encontrada en: $APP_PATH"
           cp -r "$APP_PATH" Payload/
+          
+          # Verificar e inyectar permisos de privacidad críticos en Info.plist para evitar SIGABRT al abrir
+          python3 -c "
+          import plistlib, os
+          plist_path = 'Payload/OpticLink.app/Info.plist'
+          if os.path.exists(plist_path):
+              with open(plist_path, 'rb') as f:
+                  p = plistlib.load(f)
+              p['NSCameraUsageDescription'] = 'OpticLink necesita acceso a la cámara para transmitir video en alta definición a tu computadora Linux con control manual total.'
+              p['NSMicrophoneUsageDescription'] = 'OpticLink necesita acceso al micrófono para transmitir audio a tu computadora.'
+              p['NSLocalNetworkUsageDescription'] = 'OpticLink se conecta con tu computadora a través de la red local o cable USB para transmitir video y recibir comandos de control de la cámara.'
+              p['CFBundleDisplayName'] = 'OpticLink'
+              if 'UIBackgroundModes' not in p:
+                  p['UIBackgroundModes'] = ['audio']
+              with open(plist_path, 'wb') as f:
+                  plistlib.dump(p, f)
+              print('Info.plist verificado exitosamente con todas las descripciones de permisos requeridas por iOS.')
+          "
+          
           zip -r OpticLink.ipa Payload
           ls -la OpticLink.ipa
 

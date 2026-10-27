@@ -143,6 +143,7 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true
             controller.start()
         }
     }
@@ -164,6 +165,13 @@ class AppCoordinator: ObservableObject, CameraManagerDelegate, VideoEncoderDeleg
         cameraManager.delegate = self
         encoder.delegate = self
         server.delegate = self
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .videoChat, options: [.defaultToSpeaker, .allowBluetooth])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("OpticLink: Error configurando AVAudioSession: \(error)")
+        }
         
         cameraManager.startSession()
         server.start()
