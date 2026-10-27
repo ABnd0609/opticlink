@@ -89,7 +89,7 @@ public class StreamServer {
     public func broadcastVideoData(_ data: Data) {
         connectionQueue.sync {
             for connection in self.activeVideoConnections {
-                connection.send(content: data, completion: .contentProcessed({ error in
+                connection.send(content: data, contentContext: .defaultMessage, isComplete: false, completion: .contentProcessed({ error in
                     if let err = error {
                         print("OpticLink: Error enviando datos de video: \(err)")
                     }
@@ -172,7 +172,7 @@ public class StreamServer {
         let messageData = (jsonString + "\n").data(using: .utf8)!
         connectionQueue.sync {
             for connection in self.activeControlConnections {
-                connection.send(content: messageData, completion: .idempotent)
+                connection.send(content: messageData, contentContext: .defaultMessage, isComplete: false, completion: .contentProcessed({ _ in }))
             }
         }
     }

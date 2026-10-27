@@ -59,6 +59,13 @@ jobs:
           zip -r OpticLink.ipa Payload
           ls -la OpticLink.ipa
 
+      - name: Subir Registro de Compilación
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build-Logs
+          path: ios/xcodebuild.log
+
       - name: Subir Artefacto IPA
         uses: actions/upload-artifact@v4
         with:
