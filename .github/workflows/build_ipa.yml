@@ -80,3 +80,14 @@ jobs:
           name: OpticLink-iOS-IPA
           path: ios/OpticLink.ipa
           retention-days: 14
+
+      - name: Publicar Release con IPA
+        uses: softprops/action-gh-release@v2
+        if: success()
+        with:
+          tag_name: v1.0.0
+          name: "OpticLink Pro v1.0.0"
+          files: ios/OpticLink.ipa
+          body: "Descarga directa de OpticLink.ipa para instalación en iOS."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
