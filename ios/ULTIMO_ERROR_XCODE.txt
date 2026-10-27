@@ -1,0 +1,20 @@
+Command line invocation:
+    /Applications/Xcode_15.4.app/Contents/Developer/usr/bin/xcodebuild clean build -project OpticLink.xcodeproj -scheme OpticLink -configuration Release -destination generic/platform=iOS -derivedDataPath ./build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= CODE_SIGN_ENTITLEMENTS= CODE_SIGNING_INJECT_BASE_ENTITLEMENTS=NO AD_HOC_CODE_SIGNING_ALLOWED=YES
+
+User defaults from command line:
+    IDEDerivedDataPathOverride = /Users/runner/work/opticlink/opticlink/ios/build
+    IDEPackageSupportUseBuiltinSCM = YES
+
+Build settings from command line:
+    AD_HOC_CODE_SIGNING_ALLOWED = YES
+    CODE_SIGN_ENTITLEMENTS = 
+    CODE_SIGN_IDENTITY = 
+    CODE_SIGNING_ALLOWED = NO
+    CODE_SIGNING_INJECT_BASE_ENTITLEMENTS = NO
+    CODE_SIGNING_REQUIRED = NO
+
+2026-10-27 20:38:34.866 xcodebuild[1210:5978] Writing error result bundle to /var/folders/s6/5hzmn6lx4dz5nxs7k_0slzph0000gn/T/ResultBundle_2026-27-10_20-38-0034.xcresult
+xcodebuild: error: Unable to read project 'OpticLink.xcodeproj'.
+	Reason: The project ‘OpticLink’ cannot be opened because it is in a future Xcode project file format (77). Adjust the project format using a compatible version of Xcode to allow it to be opened by this version of Xcode.
+
+
