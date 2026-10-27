@@ -13,7 +13,7 @@ permissions:
 jobs:
   build:
     name: Compilar IPA para iOS (macOS Cloud)
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Descargar Código Fuente

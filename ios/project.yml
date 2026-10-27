@@ -3,7 +3,6 @@ options:
   bundleIdPrefix: com.opticlink
   deploymentTarget:
     iOS: "16.0"
-  xcodeVersion: "15.4"
 
 settings:
   base:
