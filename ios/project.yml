@@ -17,6 +17,7 @@ settings:
     INFOPLIST_KEY_NSCameraUsageDescription: "OpticLink necesita acceso a la camara para transmitir video en alta definicion a tu computadora Linux con control manual total."
     INFOPLIST_KEY_NSMicrophoneUsageDescription: "OpticLink necesita acceso al microfono para transmitir audio a tu computadora."
     INFOPLIST_KEY_NSLocalNetworkUsageDescription: "OpticLink se conecta con tu computadora a traves de la red local o cable USB para transmitir video y recibir comandos de control de la camara."
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
 
 targets:
   OpticLink:

@@ -21,6 +21,7 @@ class OpticLinkWindow(Adw.ApplicationWindow):
         self.receiver = VideoReceiver(device="/dev/video0", on_status_change=self._on_receiver_status)
         self.usb_tunnel = USBTunnel()
 
+        self.set_icon_name("opticlink")
         self._is_connecting = False
         self._build_ui()
 
