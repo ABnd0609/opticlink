@@ -173,10 +173,15 @@ class AppCoordinator: ObservableObject, CameraManagerDelegate, VideoEncoderDeleg
             print("OpticLink: Error configurando AVAudioSession: \(error)")
         }
         
-        cameraManager.startSession()
         server.start()
         updateLocalIP()
         setupThermalObserver()
+        
+        AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
+            if granted {
+                self?.cameraManager.startSession()
+            }
+        }
     }
     
     private func setupThermalObserver() {
@@ -221,6 +226,10 @@ class AppCoordinator: ObservableObject, CameraManagerDelegate, VideoEncoderDeleg
     
     func didUpdateClientCount(_ count: Int) {
         self.clientCount = count
+    }
+    
+    func didConnectVideoClient() {
+        encoder.forceKeyFrame()
     }
     
     func didReceiveRPCCommand(_ json: [String: Any]) {

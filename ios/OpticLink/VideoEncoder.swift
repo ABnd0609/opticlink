@@ -52,10 +52,16 @@ public class VideoEncoder {
         VTSessionSetProperty(session, key: kVTCompressionPropertyKey_ProfileLevel, value: kVTProfileLevel_H264_High_AutoLevel)
         VTSessionSetProperty(session, key: kVTCompressionPropertyKey_AverageBitRate, value: bitrate as CFNumber)
         VTSessionSetProperty(session, key: kVTCompressionPropertyKey_ExpectedFrameRate, value: fps as CFNumber)
-        VTSessionSetProperty(session, key: kVTCompressionPropertyKey_MaxKeyFrameInterval, value: (fps * 2) as CFNumber)
+        VTSessionSetProperty(session, key: kVTCompressionPropertyKey_MaxKeyFrameInterval, value: fps as CFNumber)
         VTSessionSetProperty(session, key: kVTCompressionPropertyKey_AllowFrameReordering, value: kCFBooleanFalse)
         
         VTCompressionSessionPrepareToEncodeFrames(session)
+    }
+    
+    private var needsKeyFrame: Bool = true
+    
+    public func forceKeyFrame() {
+        needsKeyFrame = true
     }
     
     public func encode(sampleBuffer: CMSampleBuffer) {
@@ -65,15 +71,24 @@ public class VideoEncoder {
         let pts = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
         let duration = CMSampleBufferGetDuration(sampleBuffer)
         
-        VTCompressionSessionEncodeFrame(
+        var frameProperties: [CFString: Any]? = nil
+        if needsKeyFrame {
+            frameProperties = [kVTEncodeFrameOptionKey_ForceKeyFrame: true]
+            needsKeyFrame = false
+        }
+        
+        let status = VTCompressionSessionEncodeFrame(
             session,
             imageBuffer: imageBuffer,
             presentationTimeStamp: pts,
             duration: duration,
-            frameProperties: nil,
+            frameProperties: frameProperties as CFDictionary?,
             sourceFrameRefcon: nil,
             infoFlagsOut: nil
         )
+        if status != noErr {
+            print("OpticLink: Error en VTCompressionSessionEncodeFrame: \(status)")
+        }
     }
 }
 

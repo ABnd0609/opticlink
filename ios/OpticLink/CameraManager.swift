@@ -39,7 +39,7 @@ public class CameraManager: NSObject {
             self.configureDevice(for: .wide)
             
             self.videoDataOutput.videoSettings = [
-                kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)
+                kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange)
             ]
             self.videoDataOutput.alwaysDiscardsLateVideoFrames = true
             self.videoDataOutput.setSampleBufferDelegate(self, queue: self.videoOutputQueue)
@@ -60,8 +60,18 @@ public class CameraManager: NSObject {
     
     public func startSession() {
         sessionQueue.async { [weak self] in
-            guard let self = self, !self.captureSession.isRunning else { return }
-            self.captureSession.startRunning()
+            guard let self = self else { return }
+            if self.currentInput == nil {
+                self.captureSession.beginConfiguration()
+                self.configureDevice(for: self.activeLens)
+                if let connection = self.videoDataOutput.connection(with: .video), connection.isVideoOrientationSupported {
+                    connection.videoOrientation = .landscapeRight
+                }
+                self.captureSession.commitConfiguration()
+            }
+            if !self.captureSession.isRunning {
+                self.captureSession.startRunning()
+            }
         }
     }
     
@@ -113,7 +123,7 @@ public class CameraManager: NSObject {
             position: position
         )
         
-        guard let device = discovery.devices.first else { return }
+        guard let device = discovery.devices.first(where: { $0.deviceType == deviceType }) ?? discovery.devices.first else { return }
         
         do {
             let input = try AVCaptureDeviceInput(device: device)

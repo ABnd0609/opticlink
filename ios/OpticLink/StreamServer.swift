@@ -4,6 +4,7 @@ import Network
 public protocol StreamServerDelegate: AnyObject {
     func didUpdateClientCount(_ count: Int)
     func didReceiveRPCCommand(_ json: [String: Any])
+    func didConnectVideoClient()
 }
 
 public class StreamServer {
@@ -43,7 +44,6 @@ public class StreamServer {
     private func startVideoServer() {
         do {
             let params = NWParameters.tcp
-            params.allowFastOpen = true
             let port = NWEndpoint.Port(rawValue: videoPort)!
             videoListener = try NWListener(using: params, on: port)
             
@@ -70,8 +70,10 @@ public class StreamServer {
                     self.activeVideoConnections.append(conn)
                     DispatchQueue.main.async {
                         self.delegate?.didUpdateClientCount(self.activeVideoConnections.count)
+                        self.delegate?.didConnectVideoClient()
                     }
                 }
+                self.listenForVideoClientDisconnect(conn)
             case .failed, .cancelled:
                 self.connectionQueue.async(flags: .barrier) {
                     self.activeVideoConnections.removeAll { $0 === conn }
@@ -84,6 +86,17 @@ public class StreamServer {
             }
         }
         connection.start(queue: .global(qos: .userInteractive))
+    }
+    
+    private func listenForVideoClientDisconnect(_ connection: NWConnection) {
+        connection.receive(minimumIncompleteLength: 1, maximumLength: 1024) { [weak self, weak connection] _, _, isComplete, error in
+            guard let conn = connection else { return }
+            if isComplete || error != nil {
+                conn.cancel()
+            } else {
+                self?.listenForVideoClientDisconnect(conn)
+            }
+        }
     }
     
     public func broadcastVideoData(_ data: Data) {

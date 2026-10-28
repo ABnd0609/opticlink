@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import subprocess
 import threading
 import gi
 gi.require_version("Gtk", "4.0")
@@ -76,11 +77,18 @@ class OpticLinkWindow(Adw.ApplicationWindow):
         self.btn_test = Gtk.Button(label="Probar Cámara Virtual")
         self.btn_test.connect("clicked", self._on_test_clicked)
 
+        self.btn_open_cam = Gtk.Button(label="Ver Cámara en Pantalla")
+        self.btn_open_cam.connect("clicked", lambda _: subprocess.Popen(["snapshot"]))
+
         box_btns = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        box_btns.append(self.btn_open_cam)
         box_btns.append(self.btn_test)
         box_btns.append(self.btn_connect)
         conn_actions_row.add_suffix(box_btns)
         conn_group.add(conn_actions_row)
+
+        info_row = Adw.ActionRow(title="Dispositivo en Aplicaciones", subtitle="En Zoom, Meet, Teams o navegadores aparece como 'OBS Virtual Camera'")
+        conn_group.add(info_row)
 
         # --- SECCIÓN 2: Lentes y Zoom ---
         lens_group = Adw.PreferencesGroup(title="Óptica y Selección de Cámara", description="Cambia entre los sensores reales del iPhone")
