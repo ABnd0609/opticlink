@@ -83,7 +83,7 @@ class OpticLinkWindow(Adw.ApplicationWindow):
         conn_actions_row.add_suffix(box_btns)
         conn_group.add(conn_actions_row)
 
-        info_row = Adw.ActionRow(title="Dispositivo en Aplicaciones", subtitle="En Zoom, Meet, Teams o navegadores aparece como 'OBS Virtual Camera'")
+        info_row = Adw.ActionRow(title="Dispositivo en Aplicaciones", subtitle="En Zoom, Meet, Teams, Discord o Cámara aparece como 'OpticLink iPhone Camera'")
         conn_group.add(info_row)
 
         # --- SECCIÓN 2: Lentes y Zoom ---

@@ -31,7 +31,7 @@ class VideoReceiver:
         """
         self.stop()
         
-        # Pipeline blindado con normalización de escala (1920x1080 YUY2)
+        # Pipeline nativo moderno PipeWire con resolución FullHD y escalado defensivo
         pipeline_str = (
             f"tcpclientsrc host={host} port={port} ! "
             f"h264parse ! "
@@ -39,28 +39,35 @@ class VideoReceiver:
             f"videoconvert ! "
             f"videoscale ! "
             f"video/x-raw,format=YUY2,width=1920,height=1080 ! "
-            f"v4l2sink device={self.device} sync=false"
+            f"pipewiresink name=pwsink mode=provide"
         )
         
-        return self._launch_pipeline(pipeline_str, f"Transmitiendo desde {host}:{port} a {self.device}")
+        return self._launch_pipeline(pipeline_str, f"Cámara activa: 'OpticLink iPhone Camera' en PipeWire")
 
     def start_test_pattern(self) -> bool:
         """
-        Inicia un patrón de prueba SMPTE en /dev/video0 para validar que la cámara virtual funciona
-        incluso sin tener el iPhone conectado en este instante.
+        Inicia un patrón de prueba SMPTE nativo en PipeWire para comprobar el visor.
         """
         self.stop()
         pipeline_str = (
             f"videotestsrc pattern=smpte is-live=true ! "
             f"videoconvert ! "
             f"video/x-raw,format=YUY2,width=1280,height=720,framerate=30/1 ! "
-            f"v4l2sink device={self.device} sync=false"
+            f"pipewiresink name=pwsink mode=provide"
         )
-        return self._launch_pipeline(pipeline_str, f"Patrón de prueba activo en {self.device}")
+        return self._launch_pipeline(pipeline_str, "Patrón de prueba activo en PipeWire")
 
     def _launch_pipeline(self, pipeline_str: str, success_msg: str) -> bool:
         try:
             self.pipeline = Gst.parse_launch(pipeline_str)
+            pwsink = self.pipeline.get_by_name("pwsink")
+            if pwsink:
+                s = Gst.Structure.new_empty("props")
+                s.set_value("media.class", "Video/Source")
+                s.set_value("node.description", "OpticLink iPhone Camera")
+                s.set_value("media.role", "Camera")
+                pwsink.set_property("stream-properties", s)
+
             self._bus = self.pipeline.get_bus()
             self._bus.add_signal_watch()
             self._bus.connect("message", self._on_bus_message)
@@ -69,7 +76,7 @@ class VideoReceiver:
             if ret == Gst.StateChangeReturn.FAILURE:
                 self.stop()
                 if self.on_status_change:
-                    self.on_status_change(f"Error: Falló el inicio del pipeline GStreamer en {self.device}")
+                    self.on_status_change("Error: Falló el inicio de la cámara virtual PipeWire")
                 return False
                 
             self._is_running = True
